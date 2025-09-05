@@ -1,60 +1,41 @@
 import formidable from "formidable";
-import fs from "fs";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 
 export const config = {
   api: {
-    bodyParser: false, // Required for file uploads
+    bodyParser: false, // we use formidable instead
   },
 };
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 export default async function handler(req, res) {
-  if (req.method === "POST") {
-    try {
-      // Ensure upload directory exists
-      const uploadDir = path.join(process.cwd(), "public/schoolImages");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      const form = formidable({
-        multiples: false,
-        uploadDir,
-        keepExtensions: true, // keep .jpg, .png etc.
-      });
-
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          console.error("Upload error:", err);
-          return res.status(500).json({ error: "File upload failed" });
-        }
-
-        let imageFileName = null;
-
-        if (files?.image) {
-          const file = Array.isArray(files.image)
-            ? files.image[0]
-            : files.image;
-
-          const oldPath = file.filepath;
-          imageFileName = file.newFilename;
-          const newPath = path.join(uploadDir, imageFileName);
-
-          // Move file to /public/schoolImages
-          fs.renameSync(oldPath, newPath);
-        }
-
-        return res.status(200).json({
-          success: true,
-          filename: imageFileName,
-        });
-      });
-    } catch (error) {
-      console.error("Upload exception:", error);
-      return res.status(500).json({ error: "Server error during upload" });
-    }
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
+
+  const form = formidable({ multiples: false });
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error("Form parse error:", err);
+      return res.status(500).json({ message: "Image upload failed" });
+    }
+
+    try {
+      const file = files.image[0];
+      const result = await cloudinary.uploader.upload(file.filepath, {
+        folder: "schools",
+      });
+
+      return res.status(200).json({ url: result.secure_url });
+    } catch (error) {
+      console.error("Cloudinary error:", error);
+      return res.status(500).json({ message: "Cloudinary upload failed" });
+    }
+  });
 }

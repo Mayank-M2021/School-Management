@@ -1,7 +1,6 @@
 // pages/api/schools/index.js
 import { getPool } from '../../../lib/db';
 
-
 export default async function handler(req, res) {
   try {
     const pool = getPool();
@@ -14,16 +13,16 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       // Insert a new school
-      const { name, address, city, state, contact, email_id } = req.body;
+      const { name, address, city, state, contact, email_id, image } = req.body;
 
       if (!name || !address || !city || !state || !contact || !email_id) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
       const [result] = await pool.execute(
-        `INSERT INTO schools (name, address, city, state, contact, email_id)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [name, address, city, state, contact, email_id]
+        `INSERT INTO schools (name, address, city, state, contact, email_id, image)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [name, address, city, state, contact, email_id, image || null]
       );
 
       return res.status(201).json({ id: result.insertId });
