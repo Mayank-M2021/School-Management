@@ -43,7 +43,7 @@ export default function ShowSchools() {
         <h2>{error}</h2>
         <button
           onClick={fetchSchools}
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         >
           Try Again
         </button>
@@ -57,20 +57,20 @@ export default function ShowSchools() {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           All Schools
-          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-            ({schools.length} schools found)
+          <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+            {schools.length} found
           </span>
         </h1>
 
         {/* Filters */}
         <div className="flex gap-2 mt-4 sm:mt-0">
-          <button className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700">
+          <button className="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition">
             All Schools
           </button>
-          <button className="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-100">
+          <button className="px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
             Recent
           </button>
-          <button className="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-100">
+          <button className="px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
             A-Z
           </button>
         </div>
@@ -86,7 +86,7 @@ export default function ShowSchools() {
           </p>
           <a
             href="/addSchool"
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
           >
             Add First School
           </a>
