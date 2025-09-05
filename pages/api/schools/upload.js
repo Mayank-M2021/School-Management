@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const config = {
   api: {
-    bodyParser: false, // we use formidable instead
+    bodyParser: false, // Required for formidable
   },
 };
 
@@ -27,7 +27,13 @@ export default async function handler(req, res) {
     }
 
     try {
-      const file = files.image[0];
+      // Handle both array and single file cases
+      const file = Array.isArray(files.image) ? files.image[0] : files.image;
+
+      if (!file || !file.filepath) {
+        throw new Error("No file received");
+      }
+
       const result = await cloudinary.uploader.upload(file.filepath, {
         folder: "schools",
       });
