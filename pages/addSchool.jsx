@@ -1,127 +1,140 @@
-import { useForm } from "react-hook-form";
+// pages/addSchool.jsx
 import { useState } from "react";
-import { useRouter } from "next/router";
 
 export default function AddSchool() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    reset,
-  } = useForm({ mode: "onChange" });
+  const [formData, setFormData] = useState({
+    name: "",
+    state: "",
+    contact: "",
+    email: "",
+    image: null,
+  });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const router = useRouter();
+  const [errors, setErrors] = useState({});
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setMessage("");
+  const validate = () => {
+    let newErrors = {};
 
-    try {
-      let imageUrl = "";
+    if (!formData.name.trim()) newErrors.name = "School name is required";
+    if (!formData.state.trim()) newErrors.state = "State is required";
 
-      // ✅ Step 1: Upload to Cloudinary if image exists
-      if (data.image && data.image[0]) {
-        const formData = new FormData();
-        formData.append("image", data.image[0]);
+    if (!formData.contact.trim()) {
+      newErrors.contact = "Contact number is required";
+    } else if (!/^[0-9]{10}$/.test(formData.contact)) {
+      newErrors.contact = "Contact must be a valid 10-digit number";
+    }
 
-        const uploadResponse = await fetch("/api/schools/upload", {
-          method: "POST",
-          body: formData,
-        });
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email address";
+    }
 
-        if (!uploadResponse.ok) throw new Error("Image upload failed");
+    return newErrors;
+  };
 
-        const uploadResult = await uploadResponse.json();
-        imageUrl = uploadResult.url;
-      }
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
 
-      // ✅ Save school details
-      const schoolData = {
-        name: data.name,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        contact: data.contact,
-        email_id: data.email_id,
-        image: imageUrl,
-      };
-
-      const response = await fetch("/api/schools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(schoolData),
-      });
-
-      if (response.ok) {
-        setMessage("✅ School added successfully!");
-        reset();
-        setTimeout(() => router.push("/showSchools"), 1500);
-      } else {
-        throw new Error("Failed to add school");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setMessage("❌ Error adding school. Please try again.");
-    } finally {
-      setIsLoading(false);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      setErrors({});
+      console.log("Form submitted:", formData);
+      // TODO: send formData to backend API
     }
   };
 
   return (
-    <div className="container">
-      <div className="form-container">
-        <h1>Add New School</h1>
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md mt-10">
+      <h1 className="text-2xl font-bold mb-6">Add School</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* School Name */}
+        <div>
+          <label className="block font-medium">School Name *</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        </div>
 
-        {message && (
-          <div className={message.includes("Error") ? "error-box" : "success-box"}>
-            {message}
-          </div>
-        )}
+        {/* State */}
+        <div>
+          <label className="block font-medium">State *</label>
+          <input
+            type="text"
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+          {errors.state && (
+            <p className="text-red-500 text-sm">{errors.state}</p>
+          )}
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="form-group">
-            <label>School Name *</label>
-            <input {...register("name", { required: true })} />
-            {errors.name && <span>Name is required</span>}
-          </div>
+        {/* Contact */}
+        <div>
+          <label className="block font-medium">Contact *</label>
+          <input
+            type="text"
+            name="contact"
+            value={formData.contact}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+          {errors.contact && (
+            <p className="text-red-500 text-sm">{errors.contact}</p>
+          )}
+        </div>
 
-          <div className="form-group">
-            <label>Address *</label>
-            <textarea {...register("address", { required: true })} />
-          </div>
+        {/* Email */}
+        <div>
+          <label className="block font-medium">Email *</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
+        </div>
 
-          <div className="form-group">
-            <label>City *</label>
-            <input {...register("city", { required: true })} />
-          </div>
+        {/* School Image */}
+        <div>
+          <label className="block font-medium">School Image</label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full"
+          />
+        </div>
 
-          <div className="form-group">
-            <label>State *</label>
-            <input {...register("state", { required: true })} />
-          </div>
-
-          <div className="form-group">
-            <label>Contact *</label>
-            <input {...register("contact", { required: true })} />
-          </div>
-
-          <div className="form-group">
-            <label>Email *</label>
-            <input type="email" {...register("email_id", { required: true })} />
-          </div>
-
-          <div className="form-group">
-            <label>School Image</label>
-            <input type="file" accept="image/*" {...register("image")} />
-          </div>
-
-          <button type="submit" disabled={!isValid || isLoading}>
-            {isLoading ? "Adding..." : "Add School"}
-          </button>
-        </form>
-      </div>
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Add School
+        </button>
+      </form>
     </div>
   );
 }
