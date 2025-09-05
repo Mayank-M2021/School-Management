@@ -1,55 +1,56 @@
 // components/SchoolCard.js
 export default function SchoolCard({ school }) {
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1 p-4 flex flex-col">
+    <div className="school-card">
       {/* Image */}
-      <div className="relative">
+      <div className="school-image-container">
         <img
           src={school.image ? school.image : "/placeholder-school.jpg"}
           alt={school.name}
           onError={(e) => {
             e.currentTarget.src = "/placeholder-school.jpg";
           }}
-          className="w-full h-48 object-cover rounded-lg"
+          className="school-image"
         />
-        <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-md shadow">
-          School
-        </span>
+        <span className="school-badge">School</span>
       </div>
 
       {/* Info */}
-      <div className="mt-4 flex-1">
-        <h3 className="text-lg font-semibold text-gray-900">{school.name}</h3>
-        <p className="text-sm text-gray-600">
-          {school.city}, {school.state}
-        </p>
+      <div className="school-info">
+        <h3 className="school-name">{school.name}</h3>
+        
+        <div className="school-location">
+          <span className="location-icon">📍</span>
+          <span className="school-city">{school.city}, {school.state}</span>
+        </div>
+
         {school.address && (
-          <p className="text-gray-500 text-sm mt-1">{school.address}</p>
+          <p className="school-address">{school.address}</p>
         )}
 
         {/* Contact */}
-        <div className="mt-3 space-y-1 text-sm">
-          {school.contact && (
-            <p className="flex items-center text-gray-700">
-              <span className="mr-2">📞</span> {school.contact}
-            </p>
-          )}
-          {school.email_id && (
-            <p className="flex items-center text-gray-700 break-words">
-              <span className="mr-2">✉️</span> {school.email_id}
-            </p>
-          )}
-        </div>
-      </div>
+        {(school.contact || school.email_id) && (
+          <div className="school-contact-info">
+            {school.contact && (
+              <div className="contact-item">
+                <span className="contact-icon">📞</span>
+                <span>{school.contact}</span>
+              </div>
+            )}
+            {school.email_id && (
+              <div className="contact-item">
+                <span className="contact-icon">✉️</span>
+                <span className="school-email">{school.email_id}</span>
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Actions */}
-      <div className="mt-4 flex gap-2">
-        <button className="flex-1 bg-green-600 text-white py-2 rounded-lg shadow hover:bg-green-700 transition">
-          View Details
-        </button>
-        <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg shadow hover:bg-blue-700 transition">
-          Contact
-        </button>
+        {/* Actions */}
+        <div className="school-actions">
+          <button className="btn-view-details">View Details</button>
+          <button className="btn-contact">Contact</button>
+        </div>
       </div>
     </div>
   );
