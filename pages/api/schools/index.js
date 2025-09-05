@@ -1,5 +1,6 @@
 // pages/api/schools/index.js
-import { getPool } from '@/lib/db';
+import { getPool } from '../../../lib/db';
+
 
 export default async function handler(req, res) {
   try {
