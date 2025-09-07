@@ -183,7 +183,7 @@ school-directory/
 | Edge | 90+ |
 
 
-**⭐ Star this repository if you find it helpful!**
+**⭐ Star this repository if you find it helpful! and Follow**
 
 Made with ❤️ by [Mayank Malhotra ](https://github.com/Mayank-M2021)
 
